@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Film Assistant</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Black & White Film Assistant</h1>
+
+<div class="card">
+<h2>Development Calculator</h2>
+<label>Film</label>
+<select id="film"></select>
+
+<label>Rodinal Dilution</label>
+<select id="dilution">
+<option value="25">1+25</option>
+<option value="50" selected>1+50</option>
+<option value="100">1+100</option>
+</select>
+
+<label>ASA / ISO</label>
+<input id="asa" type="number" value="400">
+
+<label>Temperature °C</label>
+<input id="temp" type="number" value="20">
+
+<button onclick="calculate()">Calculate</button>
+<div id="result"></div>
+</div>
+
+<div class="card">
+<h2>Rodinal Mixing Calculator</h2>
+<label>Total Solution (ml)</label>
+<input id="volume" type="number" value="500">
+<button onclick="mixCalc()">Calculate Mix</button>
+<div id="mix"></div>
+</div>
+
+<div class="card">
+<h2>Darkroom Timer</h2>
+<input id="minutes" type="number" value="11">
+<button onclick="startTimer()">Start</button>
+<div id="timer">Ready</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
