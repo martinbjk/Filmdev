@@ -64,8 +64,9 @@ input,select,button,textarea{width:100%;padding:8px;margin:5px 0}
 
 <div class="card">
 <h2>Loggbok</h2>
-<textarea id="log" rows="8"></textarea>
-<button onclick="saveLog()">Spara</button>
+<textarea id="log" rows="10"></textarea>
+<button onclick="saveLog()">Spara loggbok</button>
+<button onclick="exportLog()">Exportera loggbok (.txt)</button>
 </div>
 
 <script>
@@ -77,81 +78,62 @@ const films={
 "Rollei RPX 25":25,"Rollei RPX 100":100,"Rollei RPX 400":400,
 "Adox CHS 100 II":100,"Bergger Pancro 400":400
 };
-
 const filmSel=document.getElementById("film");
-for(const f in films){
- let o=document.createElement("option");
- o.text=f;
- filmSel.add(o);
-}
-
-filmSel.onchange=()=>{
- document.getElementById("iso").value=films[filmSel.value];
-};
-filmSel.selectedIndex=0;
-filmSel.onchange();
+for(const f in films){let o=document.createElement("option");o.text=f;filmSel.add(o);}
+filmSel.onchange=()=>{document.getElementById("iso").value=films[filmSel.value];};
+filmSel.selectedIndex=0;filmSel.onchange();
 
 function calc(){
  const base=films[filmSel.value];
  const iso=Number(document.getElementById("iso").value);
  const dilution=document.getElementById("dilution").value;
-
  let baseTime=(dilution=="25")?7:(dilution=="50")?11:18;
  let stops=Math.log2(iso/base);
  let time=baseTime*(1+stops*0.25);
-
  let msg="Normal exponering.";
  if(stops>0) msg="Push: mer kontrast och korn.";
  if(stops<0) msg="Pull: mer skuggdetalj och mjukare kontrast.";
-
- document.getElementById("result").innerHTML=
- `<b>Film ISO:</b> ${base}<br>
- <b>Framkallningstid:</b> ${time.toFixed(1)} min<br>
- ${msg}`;
-
+ document.getElementById("result").innerHTML=`<b>Film ISO:</b> ${base}<br><b>Framkallningstid:</b> ${time.toFixed(1)} min<br>${msg}`;
  document.getElementById("mins").value=time.toFixed(1);
 }
-
 function mix(){
  let v=Number(document.getElementById("vol").value);
  let r=Number(document.getElementById("dilution").value);
  let rod=v/(r+1);
- let water=v-rod;
- document.getElementById("mixout").innerHTML=
- `Rodinal: ${rod.toFixed(1)} ml<br>Vatten: ${water.toFixed(1)} ml`;
+ document.getElementById("mixout").innerHTML=`Rodinal: ${rod.toFixed(1)} ml<br>Vatten: ${(v-rod).toFixed(1)} ml`;
 }
-
 let timerInt;
 function startTimer(){
  clearInterval(timerInt);
  let sec=Math.round(Number(document.getElementById("mins").value)*60);
  timerInt=setInterval(()=>{
-   let m=Math.floor(sec/60);
-   let s=sec%60;
-   document.getElementById("timer").textContent=
-   `${m}:${String(s).padStart(2,"0")}`;
-   if(sec===0){
-      clearInterval(timerInt);
-      alert("Framkallning klar!");
-   }
-   sec--;
+ let m=Math.floor(sec/60), s=sec%60;
+ document.getElementById("timer").textContent=`${m}:${String(s).padStart(2,"0")}`;
+ if(sec===0){clearInterval(timerInt);alert("Framkallning klar!");}
+ sec--;
  },1000);
 }
-
 function analyse(v){
  let txt="Negativet ser normalt ut.";
  if(v==="Tunt negativ") txt="Öka exponeringen 1/2–1 steg nästa gång.";
  if(v==="Tätt negativ") txt="Minska framkallningstiden ca 10 %.";
  document.getElementById("analysis").innerText=txt;
 }
-
 function saveLog(){
  localStorage.setItem("film_log",document.getElementById("log").value);
  alert("Loggbok sparad");
 }
-
+function exportLog(){
+ const text=document.getElementById("log").value;
+ if(text.trim()===""){alert("Loggboken är tom");return;}
+ const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+ const link=document.createElement("a");
+ link.href=URL.createObjectURL(blob);
+ link.download="FilmLog_"+new Date().toISOString().split("T")[0]+".txt";
+ link.click();
+}
 document.getElementById("log").value=localStorage.getItem("film_log")||"";
-calc(); mix(); analyse("Normal");
+calc();mix();analyse("Normal");
 </script>
 </body>
 </html>
